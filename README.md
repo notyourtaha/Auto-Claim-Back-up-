@@ -19,23 +19,49 @@ A powerful and customizable WhatsApp bot designed to automate the collection of 
  * Pop-up Prevention: Aggressively prevents the "This message will not disappear from the chat" pop-up.
  * Extensible Plugin System: Easily add new custom commands by creating files in the plugins/commands directory.
 ⚙️ Prerequisites
-Before you begin, ensure you have the following installed:
- * Node.js: Version 18.x or higher. You can download it from nodejs.org.
+Before you begin, ensure you have the following:
+ * Node.js: Version 18.x or higher.
  * npm: Node Package Manager, which comes with Node.js.
+ * Git: For cloning the repository.
  * A WhatsApp Account: This will be the account your bot uses. It's recommended to use a dedicated number.
-🚀 Installation
-Follow these steps to get your bot up and running:
- * Clone the Repository:
-   git clone https://github.com/notyourtaha/Auto-Claim-Back-up-.git
-cd Auto-Claim-Back-up-.git
+ * Termux (for Android users): A powerful terminal emulator for Android that allows you to run a Linux environment.
+ * A stable internet connection on the device hosting the bot.
+🚀 Installation & Setup on Termux
+This guide provides a complete process for setting up and running your bot on an Android device using Termux.
+1. Install Termux
+ * Important: Install Termux from F-Droid (https://f-droid.org/packages/com.termux/) or the Termux GitHub releases page. The version on Google Play Store is often outdated.
+2. Update Termux Packages
+ * Open Termux.
+ * Update and upgrade all packages:
+   pkg update && pkg upgrade -y
 
- * Install Dependencies:
+3. Install Necessary Tools
+ * Install git (for cloning the repository) and nodejs (which includes npm):
+   pkg install git nodejs -y
+
+4. Clone the Bot Repository
+ * Navigate to your desired directory (e.g., your home directory in Termux).
+ * Clone the bot's GitHub repository:
+   cd ~
+git clone https://github.com/notyourtaha/Auto-Claim-Back-up-.git
+
+   This will create a folder named Auto-Claim-Back-up-.git in your Termux home directory.
+5. Navigate into the Bot's Directory
+ * Change your current directory to the bot's folder:
+   cd Auto-Claim-Back-up-.git
+
+6. Install Node.js Dependencies
+ * Install all required Node.js packages:
    npm install
-# Ensure Baileys is up-to-date
-npm install @whiskeysockets/baileys@latest
 
- * Create config.cjs:
-   Create a file named config.cjs in the root directory of your bot (same level as index.cjs) and add the following content. Make sure to replace 923004204338 with your actual WhatsApp number (without + or spaces).
+ * Ensure Baileys (the WhatsApp library) is up-to-date:
+   npm install @whiskeysockets/baileys@latest
+
+7. Create config.cjs
+ * Create a file named config.cjs in the bot's root directory (same level as index.cjs). You can use a text editor like nano or vim in Termux:
+   nano config.cjs
+
+ * Paste the following content into the file. Remember to replace 923004204338 with your actual WhatsApp number (without + or spaces).
    // config.cjs
 module.exports = {
   // Your WhatsApp number without any leading '+' or spaces.
@@ -75,31 +101,61 @@ module.exports = {
   }
 };
 
- * Initial Run & QR Code Scan:
-   The first time you run the bot, it will generate a QR code in your terminal.
+ * Save the file (in nano, press Ctrl+X, then Y to confirm, then Enter).
+8. Initial Run & QR Code Scan
+ * Run the bot for the first time. It will generate a QR code in your Termux terminal.
    node index.cjs
 
-   Scan this QR code using your WhatsApp app (WhatsApp Settings -> Linked Devices -> Link a Device).
-   A session_dir folder will be created to store your session data. Do not delete this folder unless you want to re-authenticate.
- * Enable Auto-Collectors:
-   After the bot connects and sends you an "Online" message in your DM, you must enable the auto-collectors:
+ * Scan this QR code using your WhatsApp app on another phone (or the same phone if you can split-screen/switch apps quickly). Go to WhatsApp Settings -> Linked Devices -> Link a Device.
+ * A session_dir folder will be created in the bot's directory to store your session data. Do not delete this folder unless you want to re-authenticate.
+9. Enable Auto-Collectors
+ * After the bot connects and sends you an "Online" message in your WhatsApp DM, you must enable the auto-collectors:
    * To enable global card auto-collection, send !π .. to the bot in your DM.
    * To enable global Pokémon auto-collection, send !√ .. to the bot in your DM.
    * You will receive confirmation messages.
-🏃 Running the Bot
-Once installed and configured:
- * To run in the foreground (for testing):
+🏃 Running the Bot on Termux
+Running in the Foreground (for testing/monitoring):
+ * Simply execute:
    node index.cjs
 
-   Close the terminal window to stop the bot.
- * To run in the background (recommended for production):
-   Use a process manager like PM2.
-   * Install PM2 globally: npm install -g pm2
-   * Start the bot with PM2: pm2 start index.cjs --name autocollector-bot
-   * Save PM2 configuration (to auto-start on reboot): pm2 save
-   * To view logs: pm2 logs autocollector-bot
-   * To stop: pm2 stop autocollector-bot
-   * To restart: pm2 restart autocollector-bot
+ * The bot's output will be visible in the Termux terminal. If you close Termux or your phone goes to deep sleep, the bot will stop.
+Running in the Background (Recommended for continuous operation):
+To keep the bot running even if Termux is closed or your phone screen is off, use pm2 (a Node.js process manager).
+ * Install PM2:
+   npm install -g pm2
+
+ * Start the Bot with PM2:
+   Make sure you are in the bot's directory (cd Auto-Claim-Back-up-.git).
+   pm2 start index.cjs --name autocollector-bot
+
+   You should see output indicating the bot has started.
+ * Save PM2 Configuration (Optional, but Recommended):
+   This command ensures PM2 will automatically restart your bot if your device reboots.
+   pm2 save
+
+   PM2 might ask you to run a command to set up startup scripts. Follow its instructions.
+ * Manage PM2 Processes:
+   * View logs: pm2 logs autocollector-bot
+   * List all PM2 processes: pm2 list
+   * Stop the bot: pm2 stop autocollector-bot
+   * Restart the bot: pm2 restart autocollector-bot
+   * Delete the process from PM2: pm2 delete autocollector-bot
+Keeping Termux Awake (Crucial for Background Operation)
+For the bot to run reliably in the background, you need to prevent Termux from being killed by Android's battery optimization.
+ * Acquire a Wake Lock:
+   Inside Termux, run:
+   termux-wake-lock
+
+   This will keep the CPU awake. You'll see a persistent notification from Termux. To release the wake lock, run termux-wake-unlock.
+ * Disable Battery Optimization for Termux:
+   * Go to your Android device's Settings.
+   * Search for "Battery optimization" or "App battery usage".
+   * Find "Termux" in the list.
+   * Set it to "Don't optimize" or "Unrestricted" (exact wording varies by Android version).
+ * Lock Termux in Recents (Optional):
+   * Open your phone's recent apps screen.
+   * Long-press on the Termux app card.
+   * Look for an option like "Lock" or a padlock icon to prevent it from being swiped away or killed by the system.
 💬 Bot Commands
 All commands start with !. Commands marked "(Owner only)" can only be used by the ownerNumber defined in config.cjs.
 General Commands
@@ -214,6 +270,9 @@ module.exports = {
    * Ensure you are the owner.
    * Check the amount and delay parameters against the MAX_TEST_MESSAGES (200) and MIN_TEST_MESSAGE_DELAY (500ms) safeguards.
    * Verify the target JID is valid.
+ * Bot stops running when Termux is closed or phone screen is off:
+   * Ensure you have used termux-wake-lock and disabled battery optimization for the Termux app in your Android settings.
+   * Consider using pm2 to run the bot in the background (see "Running in the Background" section).
 📞 Contact & Support
 For help, support, or any inquiries, please feel free to reach out:
  * Owner: 🗣️ T A H A 🔥
